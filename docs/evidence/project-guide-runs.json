@@ -1,0 +1,1124 @@
+{
+  "capturedAt": "2026-09-06T19:45:30.388Z",
+  "origin": "https://rehearsal-kumuditha.vercel.app",
+  "sourceCommit": "f4bb587",
+  "runs": [
+    {
+      "id": "65f1a300-7c23-4773-a8c1-ac5d894be564",
+      "scenario": "lost-response",
+      "strategy": "baseline",
+      "startedAt": "2026-09-06T19:45:15.483Z",
+      "duration": 344,
+      "events": [
+        {
+          "id": 1,
+          "at": "2026-09-06T19:45:15.483Z",
+          "elapsed": 0,
+          "service": "workflow",
+          "action": "Rehearsal started",
+          "detail": "Baseline strategy · real HTTP sandbox requests",
+          "status": "info"
+        },
+        {
+          "id": 2,
+          "at": "2026-09-06T19:45:15.483Z",
+          "elapsed": 0,
+          "service": "inventory",
+          "action": "Request sent",
+          "detail": "POST /execute · operation reserve-stock",
+          "status": "info"
+        },
+        {
+          "id": 3,
+          "at": "2026-09-06T19:45:15.487Z",
+          "elapsed": 4,
+          "service": "inventory",
+          "action": "Response received",
+          "detail": "201 Created",
+          "status": "success",
+          "code": 201
+        },
+        {
+          "id": 4,
+          "at": "2026-09-06T19:45:15.487Z",
+          "elapsed": 4,
+          "service": "payment",
+          "action": "Request sent",
+          "detail": "POST /execute · operation authorize-payment",
+          "status": "info"
+        },
+        {
+          "id": 5,
+          "at": "2026-09-06T19:45:15.490Z",
+          "elapsed": 7,
+          "service": "payment",
+          "action": "Response received",
+          "detail": "201 Created",
+          "status": "success",
+          "code": 201
+        },
+        {
+          "id": 6,
+          "at": "2026-09-06T19:45:15.490Z",
+          "elapsed": 7,
+          "service": "delivery",
+          "action": "Request sent",
+          "detail": "POST /execute · operation book-delivery",
+          "status": "info"
+        },
+        {
+          "id": 7,
+          "at": "2026-09-06T19:45:15.642Z",
+          "elapsed": 159,
+          "service": "delivery",
+          "action": "Response deadline exceeded",
+          "detail": "150ms deadline reached. A timeout does not prove the operation failed.",
+          "status": "warning"
+        },
+        {
+          "id": 8,
+          "at": "2026-09-06T19:45:15.642Z",
+          "elapsed": 159,
+          "service": "delivery",
+          "action": "Blind retry",
+          "detail": "Retrying with a new operation key; the original outcome is still unknown.",
+          "status": "error"
+        },
+        {
+          "id": 9,
+          "at": "2026-09-06T19:45:15.642Z",
+          "elapsed": 159,
+          "service": "delivery",
+          "action": "Request sent",
+          "detail": "POST /execute · operation 318b9d97-776c-468c-ae77-c66c3190d473",
+          "status": "info"
+        },
+        {
+          "id": 10,
+          "at": "2026-09-06T19:45:15.793Z",
+          "elapsed": 310,
+          "service": "delivery",
+          "action": "Retry timed out",
+          "detail": "Inspect the provider ledger to see what actually committed.",
+          "status": "error"
+        },
+        {
+          "id": 11,
+          "at": "2026-09-06T19:45:15.827Z",
+          "elapsed": 344,
+          "service": "workflow",
+          "action": "Business checks complete",
+          "detail": "3/4 invariants hold. Provider ledgers inspected.",
+          "status": "error"
+        }
+      ],
+      "ledger": {
+        "reservations": 1,
+        "authorizations": 1,
+        "deliveries": 2
+      },
+      "checks": [
+        {
+          "name": "Stock reserved once",
+          "passed": true,
+          "expected": "1 reservation",
+          "actual": "1 reservation(s)"
+        },
+        {
+          "name": "Payment authorized once",
+          "passed": true,
+          "expected": "1 authorization",
+          "actual": "1 authorization(s)"
+        },
+        {
+          "name": "One delivery per paid order",
+          "passed": false,
+          "expected": "1 delivery",
+          "actual": "2 delivery booking(s)"
+        },
+        {
+          "name": "Payment outcome verified",
+          "passed": true,
+          "expected": "Confirmed authorization",
+          "actual": "Confirmed authorization"
+        }
+      ],
+      "outcome": "failed",
+      "transport": "gateway-configured"
+    },
+    {
+      "id": "94f063c3-c12f-43a2-bd1c-428b9ad1648b",
+      "scenario": "lost-response",
+      "strategy": "recovery",
+      "startedAt": "2026-09-06T19:45:25.336Z",
+      "duration": 223,
+      "events": [
+        {
+          "id": 1,
+          "at": "2026-09-06T19:45:25.336Z",
+          "elapsed": 0,
+          "service": "workflow",
+          "action": "Rehearsal started",
+          "detail": "Recovery strategy · real HTTP sandbox requests",
+          "status": "info"
+        },
+        {
+          "id": 2,
+          "at": "2026-09-06T19:45:25.336Z",
+          "elapsed": 0,
+          "service": "inventory",
+          "action": "Request sent",
+          "detail": "POST /execute · operation reserve-stock",
+          "status": "info"
+        },
+        {
+          "id": 3,
+          "at": "2026-09-06T19:45:25.340Z",
+          "elapsed": 4,
+          "service": "inventory",
+          "action": "Response received",
+          "detail": "201 Created",
+          "status": "success",
+          "code": 201
+        },
+        {
+          "id": 4,
+          "at": "2026-09-06T19:45:25.340Z",
+          "elapsed": 4,
+          "service": "payment",
+          "action": "Request sent",
+          "detail": "POST /execute · operation authorize-payment",
+          "status": "info"
+        },
+        {
+          "id": 5,
+          "at": "2026-09-06T19:45:25.343Z",
+          "elapsed": 6,
+          "service": "payment",
+          "action": "Response received",
+          "detail": "201 Created",
+          "status": "success",
+          "code": 201
+        },
+        {
+          "id": 6,
+          "at": "2026-09-06T19:45:25.343Z",
+          "elapsed": 7,
+          "service": "delivery",
+          "action": "Request sent",
+          "detail": "POST /execute · operation book-delivery",
+          "status": "info"
+        },
+        {
+          "id": 7,
+          "at": "2026-09-06T19:45:25.494Z",
+          "elapsed": 158,
+          "service": "delivery",
+          "action": "Response deadline exceeded",
+          "detail": "150ms deadline reached. A timeout does not prove the operation failed.",
+          "status": "warning"
+        },
+        {
+          "id": 8,
+          "at": "2026-09-06T19:45:25.494Z",
+          "elapsed": 158,
+          "service": "delivery",
+          "action": "Request sent",
+          "detail": "POST /execute · operation book-delivery",
+          "status": "info"
+        },
+        {
+          "id": 9,
+          "at": "2026-09-06T19:45:25.522Z",
+          "elapsed": 186,
+          "service": "delivery",
+          "action": "Response received",
+          "detail": "200 OK",
+          "status": "success",
+          "code": 200
+        },
+        {
+          "id": 10,
+          "at": "2026-09-06T19:45:25.522Z",
+          "elapsed": 186,
+          "service": "delivery",
+          "action": "Delivery reconciled",
+          "detail": "Same operation key returns the already-created delivery. No duplicate booking.",
+          "status": "success"
+        },
+        {
+          "id": 11,
+          "at": "2026-09-06T19:45:25.560Z",
+          "elapsed": 223,
+          "service": "workflow",
+          "action": "Business checks complete",
+          "detail": "4/4 invariants hold. Provider ledgers inspected.",
+          "status": "success"
+        }
+      ],
+      "ledger": {
+        "reservations": 1,
+        "authorizations": 1,
+        "deliveries": 1
+      },
+      "checks": [
+        {
+          "name": "Stock reserved once",
+          "passed": true,
+          "expected": "1 reservation",
+          "actual": "1 reservation(s)"
+        },
+        {
+          "name": "Payment authorized once",
+          "passed": true,
+          "expected": "1 authorization",
+          "actual": "1 authorization(s)"
+        },
+        {
+          "name": "One delivery per paid order",
+          "passed": true,
+          "expected": "1 delivery",
+          "actual": "1 delivery booking(s)"
+        },
+        {
+          "name": "Payment outcome verified",
+          "passed": true,
+          "expected": "Confirmed authorization",
+          "actual": "Confirmed authorization"
+        }
+      ],
+      "outcome": "passed",
+      "transport": "gateway-configured"
+    },
+    {
+      "id": "aabde6d2-5667-4397-84ec-729104b0b713",
+      "scenario": "duplicate-event",
+      "strategy": "baseline",
+      "startedAt": "2026-09-06T19:45:26.641Z",
+      "duration": 73,
+      "events": [
+        {
+          "id": 1,
+          "at": "2026-09-06T19:45:26.641Z",
+          "elapsed": 0,
+          "service": "workflow",
+          "action": "Rehearsal started",
+          "detail": "Baseline strategy · real HTTP sandbox requests",
+          "status": "info"
+        },
+        {
+          "id": 2,
+          "at": "2026-09-06T19:45:26.641Z",
+          "elapsed": 0,
+          "service": "inventory",
+          "action": "Request sent",
+          "detail": "POST /execute · operation reserve-stock",
+          "status": "info"
+        },
+        {
+          "id": 3,
+          "at": "2026-09-06T19:45:26.644Z",
+          "elapsed": 3,
+          "service": "inventory",
+          "action": "Response received",
+          "detail": "201 Created",
+          "status": "success",
+          "code": 201
+        },
+        {
+          "id": 4,
+          "at": "2026-09-06T19:45:26.644Z",
+          "elapsed": 3,
+          "service": "payment",
+          "action": "Request sent",
+          "detail": "POST /execute · operation authorize-payment",
+          "status": "info"
+        },
+        {
+          "id": 5,
+          "at": "2026-09-06T19:45:26.647Z",
+          "elapsed": 6,
+          "service": "payment",
+          "action": "Response received",
+          "detail": "201 Created",
+          "status": "success",
+          "code": 201
+        },
+        {
+          "id": 6,
+          "at": "2026-09-06T19:45:26.648Z",
+          "elapsed": 7,
+          "service": "delivery",
+          "action": "Request sent",
+          "detail": "POST /execute · operation book-delivery",
+          "status": "info"
+        },
+        {
+          "id": 7,
+          "at": "2026-09-06T19:45:26.674Z",
+          "elapsed": 32,
+          "service": "delivery",
+          "action": "Response received",
+          "detail": "201 Created",
+          "status": "success",
+          "code": 201
+        },
+        {
+          "id": 8,
+          "at": "2026-09-06T19:45:26.674Z",
+          "elapsed": 32,
+          "service": "workflow",
+          "action": "Duplicate event received",
+          "detail": "Re-delivering the same payment-completed event.",
+          "status": "warning"
+        },
+        {
+          "id": 9,
+          "at": "2026-09-06T19:45:26.674Z",
+          "elapsed": 32,
+          "service": "delivery",
+          "action": "Request sent",
+          "detail": "POST /execute · operation 87fb30ce-4eeb-46e5-a617-75cbf4bcfda6",
+          "status": "info"
+        },
+        {
+          "id": 10,
+          "at": "2026-09-06T19:45:26.699Z",
+          "elapsed": 58,
+          "service": "delivery",
+          "action": "Response received",
+          "detail": "201 Created",
+          "status": "success",
+          "code": 201
+        },
+        {
+          "id": 11,
+          "at": "2026-09-06T19:45:26.700Z",
+          "elapsed": 59,
+          "service": "delivery",
+          "action": "Second delivery created",
+          "detail": "A fresh key allowed another delivery for the same order.",
+          "status": "error"
+        },
+        {
+          "id": 12,
+          "at": "2026-09-06T19:45:26.714Z",
+          "elapsed": 73,
+          "service": "workflow",
+          "action": "Business checks complete",
+          "detail": "3/4 invariants hold. Provider ledgers inspected.",
+          "status": "error"
+        }
+      ],
+      "ledger": {
+        "reservations": 1,
+        "authorizations": 1,
+        "deliveries": 2
+      },
+      "checks": [
+        {
+          "name": "Stock reserved once",
+          "passed": true,
+          "expected": "1 reservation",
+          "actual": "1 reservation(s)"
+        },
+        {
+          "name": "Payment authorized once",
+          "passed": true,
+          "expected": "1 authorization",
+          "actual": "1 authorization(s)"
+        },
+        {
+          "name": "One delivery per paid order",
+          "passed": false,
+          "expected": "1 delivery",
+          "actual": "2 delivery booking(s)"
+        },
+        {
+          "name": "Payment outcome verified",
+          "passed": true,
+          "expected": "Confirmed authorization",
+          "actual": "Confirmed authorization"
+        }
+      ],
+      "outcome": "failed",
+      "transport": "gateway-configured"
+    },
+    {
+      "id": "5d147849-2cff-4284-8ae4-e4869478d089",
+      "scenario": "duplicate-event",
+      "strategy": "recovery",
+      "startedAt": "2026-09-06T19:45:27.890Z",
+      "duration": 47,
+      "events": [
+        {
+          "id": 1,
+          "at": "2026-09-06T19:45:27.890Z",
+          "elapsed": 0,
+          "service": "workflow",
+          "action": "Rehearsal started",
+          "detail": "Recovery strategy · real HTTP sandbox requests",
+          "status": "info"
+        },
+        {
+          "id": 2,
+          "at": "2026-09-06T19:45:27.890Z",
+          "elapsed": 0,
+          "service": "inventory",
+          "action": "Request sent",
+          "detail": "POST /execute · operation reserve-stock",
+          "status": "info"
+        },
+        {
+          "id": 3,
+          "at": "2026-09-06T19:45:27.894Z",
+          "elapsed": 4,
+          "service": "inventory",
+          "action": "Response received",
+          "detail": "201 Created",
+          "status": "success",
+          "code": 201
+        },
+        {
+          "id": 4,
+          "at": "2026-09-06T19:45:27.894Z",
+          "elapsed": 4,
+          "service": "payment",
+          "action": "Request sent",
+          "detail": "POST /execute · operation authorize-payment",
+          "status": "info"
+        },
+        {
+          "id": 5,
+          "at": "2026-09-06T19:45:27.897Z",
+          "elapsed": 7,
+          "service": "payment",
+          "action": "Response received",
+          "detail": "201 Created",
+          "status": "success",
+          "code": 201
+        },
+        {
+          "id": 6,
+          "at": "2026-09-06T19:45:27.897Z",
+          "elapsed": 7,
+          "service": "delivery",
+          "action": "Request sent",
+          "detail": "POST /execute · operation book-delivery",
+          "status": "info"
+        },
+        {
+          "id": 7,
+          "at": "2026-09-06T19:45:27.912Z",
+          "elapsed": 22,
+          "service": "delivery",
+          "action": "Response received",
+          "detail": "201 Created",
+          "status": "success",
+          "code": 201
+        },
+        {
+          "id": 8,
+          "at": "2026-09-06T19:45:27.912Z",
+          "elapsed": 22,
+          "service": "workflow",
+          "action": "Duplicate event received",
+          "detail": "Re-delivering the same payment-completed event.",
+          "status": "warning"
+        },
+        {
+          "id": 9,
+          "at": "2026-09-06T19:45:27.912Z",
+          "elapsed": 22,
+          "service": "delivery",
+          "action": "Request sent",
+          "detail": "POST /execute · operation book-delivery",
+          "status": "info"
+        },
+        {
+          "id": 10,
+          "at": "2026-09-06T19:45:27.922Z",
+          "elapsed": 32,
+          "service": "delivery",
+          "action": "Response received",
+          "detail": "200 OK",
+          "status": "success",
+          "code": 200
+        },
+        {
+          "id": 11,
+          "at": "2026-09-06T19:45:27.922Z",
+          "elapsed": 32,
+          "service": "delivery",
+          "action": "Duplicate suppressed",
+          "detail": "The operation key resolves to the existing delivery.",
+          "status": "success"
+        },
+        {
+          "id": 12,
+          "at": "2026-09-06T19:45:27.936Z",
+          "elapsed": 46,
+          "service": "workflow",
+          "action": "Business checks complete",
+          "detail": "4/4 invariants hold. Provider ledgers inspected.",
+          "status": "success"
+        }
+      ],
+      "ledger": {
+        "reservations": 1,
+        "authorizations": 1,
+        "deliveries": 1
+      },
+      "checks": [
+        {
+          "name": "Stock reserved once",
+          "passed": true,
+          "expected": "1 reservation",
+          "actual": "1 reservation(s)"
+        },
+        {
+          "name": "Payment authorized once",
+          "passed": true,
+          "expected": "1 authorization",
+          "actual": "1 authorization(s)"
+        },
+        {
+          "name": "One delivery per paid order",
+          "passed": true,
+          "expected": "1 delivery",
+          "actual": "1 delivery booking(s)"
+        },
+        {
+          "name": "Payment outcome verified",
+          "passed": true,
+          "expected": "Confirmed authorization",
+          "actual": "Confirmed authorization"
+        }
+      ],
+      "outcome": "passed",
+      "transport": "gateway-configured"
+    },
+    {
+      "id": "6d16282a-8cb4-429e-80ad-0d0ca49fcb95",
+      "scenario": "rate-limit",
+      "strategy": "baseline",
+      "startedAt": "2026-09-06T19:45:29.725Z",
+      "duration": 37,
+      "events": [
+        {
+          "id": 1,
+          "at": "2026-09-06T19:45:29.725Z",
+          "elapsed": 0,
+          "service": "workflow",
+          "action": "Rehearsal started",
+          "detail": "Baseline strategy · real HTTP sandbox requests",
+          "status": "info"
+        },
+        {
+          "id": 2,
+          "at": "2026-09-06T19:45:29.725Z",
+          "elapsed": 0,
+          "service": "inventory",
+          "action": "Request sent",
+          "detail": "POST /execute · operation reserve-stock",
+          "status": "info"
+        },
+        {
+          "id": 3,
+          "at": "2026-09-06T19:45:29.731Z",
+          "elapsed": 6,
+          "service": "inventory",
+          "action": "Response received",
+          "detail": "201 Created",
+          "status": "success",
+          "code": 201
+        },
+        {
+          "id": 4,
+          "at": "2026-09-06T19:45:29.731Z",
+          "elapsed": 6,
+          "service": "payment",
+          "action": "Request sent",
+          "detail": "POST /execute · operation authorize-payment",
+          "status": "info"
+        },
+        {
+          "id": 5,
+          "at": "2026-09-06T19:45:29.735Z",
+          "elapsed": 10,
+          "service": "payment",
+          "action": "Response received",
+          "detail": "201 Created",
+          "status": "success",
+          "code": 201
+        },
+        {
+          "id": 6,
+          "at": "2026-09-06T19:45:29.736Z",
+          "elapsed": 11,
+          "service": "delivery",
+          "action": "Request sent",
+          "detail": "POST /execute · operation book-delivery",
+          "status": "info"
+        },
+        {
+          "id": 7,
+          "at": "2026-09-06T19:45:29.749Z",
+          "elapsed": 24,
+          "service": "delivery",
+          "action": "Request rejected",
+          "detail": "429 Too Many Requests",
+          "status": "warning",
+          "code": 429
+        },
+        {
+          "id": 8,
+          "at": "2026-09-06T19:45:29.749Z",
+          "elapsed": 24,
+          "service": "workflow",
+          "action": "Workflow incomplete",
+          "detail": "Payment is authorized, but no delivery was booked.",
+          "status": "error"
+        },
+        {
+          "id": 9,
+          "at": "2026-09-06T19:45:29.762Z",
+          "elapsed": 37,
+          "service": "workflow",
+          "action": "Business checks complete",
+          "detail": "3/4 invariants hold. Provider ledgers inspected.",
+          "status": "error"
+        }
+      ],
+      "ledger": {
+        "reservations": 1,
+        "authorizations": 1,
+        "deliveries": 0
+      },
+      "checks": [
+        {
+          "name": "Stock reserved once",
+          "passed": true,
+          "expected": "1 reservation",
+          "actual": "1 reservation(s)"
+        },
+        {
+          "name": "Payment authorized once",
+          "passed": true,
+          "expected": "1 authorization",
+          "actual": "1 authorization(s)"
+        },
+        {
+          "name": "One delivery per paid order",
+          "passed": false,
+          "expected": "1 delivery",
+          "actual": "0 delivery booking(s)"
+        },
+        {
+          "name": "Payment outcome verified",
+          "passed": true,
+          "expected": "Confirmed authorization",
+          "actual": "Confirmed authorization"
+        }
+      ],
+      "outcome": "failed",
+      "transport": "gateway-configured"
+    },
+    {
+      "id": "0c4c5b98-5bf0-4072-a669-b716197e48eb",
+      "scenario": "rate-limit",
+      "strategy": "recovery",
+      "startedAt": "2026-09-06T19:45:30.877Z",
+      "duration": 1053,
+      "events": [
+        {
+          "id": 1,
+          "at": "2026-09-06T19:45:30.877Z",
+          "elapsed": 0,
+          "service": "workflow",
+          "action": "Rehearsal started",
+          "detail": "Recovery strategy · real HTTP sandbox requests",
+          "status": "info"
+        },
+        {
+          "id": 2,
+          "at": "2026-09-06T19:45:30.877Z",
+          "elapsed": 0,
+          "service": "inventory",
+          "action": "Request sent",
+          "detail": "POST /execute · operation reserve-stock",
+          "status": "info"
+        },
+        {
+          "id": 3,
+          "at": "2026-09-06T19:45:30.881Z",
+          "elapsed": 4,
+          "service": "inventory",
+          "action": "Response received",
+          "detail": "201 Created",
+          "status": "success",
+          "code": 201
+        },
+        {
+          "id": 4,
+          "at": "2026-09-06T19:45:30.881Z",
+          "elapsed": 4,
+          "service": "payment",
+          "action": "Request sent",
+          "detail": "POST /execute · operation authorize-payment",
+          "status": "info"
+        },
+        {
+          "id": 5,
+          "at": "2026-09-06T19:45:30.885Z",
+          "elapsed": 8,
+          "service": "payment",
+          "action": "Response received",
+          "detail": "201 Created",
+          "status": "success",
+          "code": 201
+        },
+        {
+          "id": 6,
+          "at": "2026-09-06T19:45:30.886Z",
+          "elapsed": 9,
+          "service": "delivery",
+          "action": "Request sent",
+          "detail": "POST /execute · operation book-delivery",
+          "status": "info"
+        },
+        {
+          "id": 7,
+          "at": "2026-09-06T19:45:30.900Z",
+          "elapsed": 23,
+          "service": "delivery",
+          "action": "Request rejected",
+          "detail": "429 Too Many Requests",
+          "status": "warning",
+          "code": 429
+        },
+        {
+          "id": 8,
+          "at": "2026-09-06T19:45:30.900Z",
+          "elapsed": 23,
+          "service": "delivery",
+          "action": "Backoff scheduled",
+          "detail": "Respecting Retry-After; waiting 1000ms before one retry.",
+          "status": "warning"
+        },
+        {
+          "id": 9,
+          "at": "2026-09-06T19:45:31.901Z",
+          "elapsed": 1024,
+          "service": "delivery",
+          "action": "Request sent",
+          "detail": "POST /execute · operation book-delivery",
+          "status": "info"
+        },
+        {
+          "id": 10,
+          "at": "2026-09-06T19:45:31.913Z",
+          "elapsed": 1036,
+          "service": "delivery",
+          "action": "Response received",
+          "detail": "201 Created",
+          "status": "success",
+          "code": 201
+        },
+        {
+          "id": 11,
+          "at": "2026-09-06T19:45:31.930Z",
+          "elapsed": 1053,
+          "service": "workflow",
+          "action": "Business checks complete",
+          "detail": "4/4 invariants hold. Provider ledgers inspected.",
+          "status": "success"
+        }
+      ],
+      "ledger": {
+        "reservations": 1,
+        "authorizations": 1,
+        "deliveries": 1
+      },
+      "checks": [
+        {
+          "name": "Stock reserved once",
+          "passed": true,
+          "expected": "1 reservation",
+          "actual": "1 reservation(s)"
+        },
+        {
+          "name": "Payment authorized once",
+          "passed": true,
+          "expected": "1 authorization",
+          "actual": "1 authorization(s)"
+        },
+        {
+          "name": "One delivery per paid order",
+          "passed": true,
+          "expected": "1 delivery",
+          "actual": "1 delivery booking(s)"
+        },
+        {
+          "name": "Payment outcome verified",
+          "passed": true,
+          "expected": "Confirmed authorization",
+          "actual": "Confirmed authorization"
+        }
+      ],
+      "outcome": "passed",
+      "transport": "gateway-configured"
+    },
+    {
+      "id": "e40efa89-be16-4b01-8f30-0e176987d236",
+      "scenario": "invalid-response",
+      "strategy": "baseline",
+      "startedAt": "2026-09-06T19:45:32.864Z",
+      "duration": 22,
+      "events": [
+        {
+          "id": 1,
+          "at": "2026-09-06T19:45:32.864Z",
+          "elapsed": 0,
+          "service": "workflow",
+          "action": "Rehearsal started",
+          "detail": "Baseline strategy · real HTTP sandbox requests",
+          "status": "info"
+        },
+        {
+          "id": 2,
+          "at": "2026-09-06T19:45:32.864Z",
+          "elapsed": 0,
+          "service": "inventory",
+          "action": "Request sent",
+          "detail": "POST /execute · operation reserve-stock",
+          "status": "info"
+        },
+        {
+          "id": 3,
+          "at": "2026-09-06T19:45:32.867Z",
+          "elapsed": 3,
+          "service": "inventory",
+          "action": "Response received",
+          "detail": "201 Created",
+          "status": "success",
+          "code": 201
+        },
+        {
+          "id": 4,
+          "at": "2026-09-06T19:45:32.867Z",
+          "elapsed": 3,
+          "service": "payment",
+          "action": "Request sent",
+          "detail": "POST /execute · operation authorize-payment",
+          "status": "info"
+        },
+        {
+          "id": 5,
+          "at": "2026-09-06T19:45:32.870Z",
+          "elapsed": 7,
+          "service": "payment",
+          "action": "Response received",
+          "detail": "200 OK",
+          "status": "success",
+          "code": 200
+        },
+        {
+          "id": 6,
+          "at": "2026-09-06T19:45:32.871Z",
+          "elapsed": 7,
+          "service": "payment",
+          "action": "Contract mismatch",
+          "detail": "Expected authorizationId:string and amount:number; received a different shape.",
+          "status": "error"
+        },
+        {
+          "id": 7,
+          "at": "2026-09-06T19:45:32.871Z",
+          "elapsed": 7,
+          "service": "workflow",
+          "action": "Workflow stopped",
+          "detail": "Payment cannot be confirmed from this response. Stock and payment remain committed.",
+          "status": "error"
+        },
+        {
+          "id": 8,
+          "at": "2026-09-06T19:45:32.886Z",
+          "elapsed": 22,
+          "service": "workflow",
+          "action": "Business checks complete",
+          "detail": "2/4 invariants hold. Provider ledgers inspected.",
+          "status": "error"
+        }
+      ],
+      "ledger": {
+        "reservations": 1,
+        "authorizations": 1,
+        "deliveries": 0
+      },
+      "checks": [
+        {
+          "name": "Stock reserved once",
+          "passed": true,
+          "expected": "1 reservation",
+          "actual": "1 reservation(s)"
+        },
+        {
+          "name": "Payment authorized once",
+          "passed": true,
+          "expected": "1 authorization",
+          "actual": "1 authorization(s)"
+        },
+        {
+          "name": "One delivery per paid order",
+          "passed": false,
+          "expected": "1 delivery",
+          "actual": "0 delivery booking(s)"
+        },
+        {
+          "name": "Payment outcome verified",
+          "passed": false,
+          "expected": "Confirmed authorization",
+          "actual": "Unresolved response contract"
+        }
+      ],
+      "outcome": "failed",
+      "transport": "gateway-configured"
+    },
+    {
+      "id": "c015a466-a090-4dd1-b949-a2feafdd6c69",
+      "scenario": "invalid-response",
+      "strategy": "recovery",
+      "startedAt": "2026-09-06T19:45:33.480Z",
+      "duration": 40,
+      "events": [
+        {
+          "id": 1,
+          "at": "2026-09-06T19:45:33.480Z",
+          "elapsed": 0,
+          "service": "workflow",
+          "action": "Rehearsal started",
+          "detail": "Recovery strategy · real HTTP sandbox requests",
+          "status": "info"
+        },
+        {
+          "id": 2,
+          "at": "2026-09-06T19:45:33.480Z",
+          "elapsed": 0,
+          "service": "inventory",
+          "action": "Request sent",
+          "detail": "POST /execute · operation reserve-stock",
+          "status": "info"
+        },
+        {
+          "id": 3,
+          "at": "2026-09-06T19:45:33.485Z",
+          "elapsed": 4,
+          "service": "inventory",
+          "action": "Response received",
+          "detail": "201 Created",
+          "status": "success",
+          "code": 201
+        },
+        {
+          "id": 4,
+          "at": "2026-09-06T19:45:33.485Z",
+          "elapsed": 4,
+          "service": "payment",
+          "action": "Request sent",
+          "detail": "POST /execute · operation authorize-payment",
+          "status": "info"
+        },
+        {
+          "id": 5,
+          "at": "2026-09-06T19:45:33.487Z",
+          "elapsed": 7,
+          "service": "payment",
+          "action": "Response received",
+          "detail": "200 OK",
+          "status": "success",
+          "code": 200
+        },
+        {
+          "id": 6,
+          "at": "2026-09-06T19:45:33.488Z",
+          "elapsed": 7,
+          "service": "payment",
+          "action": "Contract mismatch",
+          "detail": "Expected authorizationId:string and amount:number; received a different shape.",
+          "status": "error"
+        },
+        {
+          "id": 7,
+          "at": "2026-09-06T19:45:33.491Z",
+          "elapsed": 10,
+          "service": "payment",
+          "action": "Payment reconciled",
+          "detail": "Ledger confirms one LKR 4,800 sandbox authorization. Continue without charging again.",
+          "status": "success"
+        },
+        {
+          "id": 8,
+          "at": "2026-09-06T19:45:33.491Z",
+          "elapsed": 10,
+          "service": "delivery",
+          "action": "Request sent",
+          "detail": "POST /execute · operation book-delivery",
+          "status": "info"
+        },
+        {
+          "id": 9,
+          "at": "2026-09-06T19:45:33.505Z",
+          "elapsed": 25,
+          "service": "delivery",
+          "action": "Response received",
+          "detail": "201 Created",
+          "status": "success",
+          "code": 201
+        },
+        {
+          "id": 10,
+          "at": "2026-09-06T19:45:33.520Z",
+          "elapsed": 40,
+          "service": "workflow",
+          "action": "Business checks complete",
+          "detail": "4/4 invariants hold. Provider ledgers inspected.",
+          "status": "success"
+        }
+      ],
+      "ledger": {
+        "reservations": 1,
+        "authorizations": 1,
+        "deliveries": 1
+      },
+      "checks": [
+        {
+          "name": "Stock reserved once",
+          "passed": true,
+          "expected": "1 reservation",
+          "actual": "1 reservation(s)"
+        },
+        {
+          "name": "Payment authorized once",
+          "passed": true,
+          "expected": "1 authorization",
+          "actual": "1 authorization(s)"
+        },
+        {
+          "name": "One delivery per paid order",
+          "passed": true,
+          "expected": "1 delivery",
+          "actual": "1 delivery booking(s)"
+        },
+        {
+          "name": "Payment outcome verified",
+          "passed": true,
+          "expected": "Confirmed authorization",
+          "actual": "Confirmed authorization"
+        }
+      ],
+      "outcome": "passed",
+      "transport": "gateway-configured"
+    }
+  ]
+}
