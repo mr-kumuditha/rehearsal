@@ -1,5 +1,6 @@
 import { endpoints } from "@/lib/engine";
 import { hosted, proxyBackend } from "@/lib/backend-proxy";
+import { gatewayHeaders, gatewayServices, gatewayTransport } from "@/lib/gateway";
 export const dynamic = "force-dynamic";
 export async function GET(request: Request) {
   if (hosted()) return proxyBackend(request, '/health');
@@ -9,9 +10,7 @@ export async function GET(request: Request) {
         const r = await fetch(`${url}/health`, {
           signal: AbortSignal.timeout(1500),
           cache: "no-store",
-          headers: process.env.GATEWAY_TOKEN
-            ? { Authorization: `Bearer ${process.env.GATEWAY_TOKEN}` }
-            : {},
+          headers: await gatewayHeaders(name),
         });
         const address = new URL(url);
         return {
@@ -26,7 +25,8 @@ export async function GET(request: Request) {
   );
   return Response.json({
     services,
-    transport: process.env.GATEWAY_TOKEN ? "gateway-configured" : "direct-http",
+    transport: gatewayTransport(),
+    gatewayServices: gatewayServices(),
     ballerina: false,
     location: 'local',
   });
