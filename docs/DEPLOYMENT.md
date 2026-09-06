@@ -20,11 +20,11 @@ Vercel does not provide a persistent local filesystem for SQLite; see its [SQLit
 
 Inspect the existing server before installing or restarting anything. In particular, check which processes own ports 80, 443 and 4320, whether Docker is installed, and whether an existing reverse proxy already serves other applications. Preserve those applications.
 
-The repository includes `backend/Dockerfile` and `backend/compose.yaml`. From a checkout on the VPS:
+The repository includes `vps-backend/Dockerfile` and `vps-backend/compose.yaml`. From a checkout on the VPS:
 
 ```sh
 # Supply BACKEND_TOKEN through a private environment file or secret manager.
-docker compose -f backend/compose.yaml up -d --build
+docker compose -f vps-backend/compose.yaml up -d --build
 ```
 
 `BACKEND_TOKEN` must be unique, at least 32 characters, and identical to the value set privately in Vercel. Never commit it, paste it into a public issue, or use the token from the test suite.
