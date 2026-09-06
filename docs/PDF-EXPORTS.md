@@ -44,6 +44,8 @@ node scripts/build-project-guide.mjs --capture-ui
 
 `GUIDE_UI_ORIGIN` can select a different controlled preview; the default is localhost:3040. `PLAYWRIGHT_CHANNEL` can select an installed Chromium channel. Capture makes isolated sandbox runs and deliberately omits workspace cookies and authentication headers from the saved evidence.
 
+The Vercel ignore file excludes only the root source `docs/` directory and explicitly includes `public/docs/`. An npm prebuild check fails if the PDF is missing from the upload, preventing a successful-looking deployment with a broken download link.
+
 The builder rejects content that extends off a page or overlaps its footer. It preserves live timings rather than inventing benchmark numbers. It also emits an actual-run sample PDF and a self-contained HTML preview under ignored `work/pdf-review/`.
 
 ## Checks performed
