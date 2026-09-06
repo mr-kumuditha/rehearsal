@@ -759,7 +759,7 @@ export default function Home() {
               </div>
               <p className="footnote">
                 Each run uses a fresh sandbox ledger. Durations are measured
-                locally and can vary; they are not production benchmarks.
+                on the execution host and can vary; they are not production benchmarks.
               </p>
             </>
           )}
@@ -865,7 +865,7 @@ export default function Home() {
                 </p>
                 <h3>What the results prove</h3>
                 <p>
-                  Each run makes actual HTTP calls to local sandbox services.
+                  Each run makes actual HTTP calls to isolated sandbox services.
                   Checks inspect their ledgers. The payment amount is a fixed
                   LKR 4,800 test authorization. There are no real financial
                   transactions. Evidence applies to these scenarios and this
@@ -882,8 +882,7 @@ export default function Home() {
                 <h3>What comes next</h3>
                 <p>
                   Ballerina workflow execution, verified gateway enforcement,
-                  custom contracts and persisted provider ledgers. Team access
-                  and shared deployment follow after the local engine is stable.
+                  custom contracts, persisted provider ledgers and team access.
                 </p>
               </section>
               <aside className="surface guide-aside">
@@ -905,7 +904,7 @@ export default function Home() {
               <GitBranch size={13} /> REHEARSAL
             </span>
             <span>Small failures. Better decisions.</span>
-            <span>v0.1 · local sandbox</span>
+            <span>v0.1 · {location === 'hosted' ? 'hosted HTTP sandbox' : 'local sandbox'}</span>
           </footer>
         </main>
       </div>
