@@ -1,0 +1,36 @@
+[Unit]
+Description=Rehearsal HTTP experiment backend
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=simple
+User=rehearsal
+Group=rehearsal
+WorkingDirectory=/opt/rehearsal/current
+EnvironmentFile=/etc/rehearsal/backend.env
+Environment=NODE_ENV=production
+Environment=HOST=127.0.0.1
+Environment=PORT=4320
+Environment=REHEARSAL_DATA_DIR=/var/lib/rehearsal
+ExecStart=/opt/rehearsal/node/bin/node --max-old-space-size=96 --experimental-strip-types vps-backend/server.ts
+Restart=on-failure
+RestartSec=3
+TimeoutStopSec=30
+StateDirectory=rehearsal
+StateDirectoryMode=0700
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+MemoryHigh=160M
+MemoryMax=192M
+TasksMax=64
+
+[Install]
+WantedBy=multi-user.target
