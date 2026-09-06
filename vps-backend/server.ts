@@ -57,5 +57,5 @@ export function createBackend(token: string, bases = endpoints()) {
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   const server=createBackend(process.env.BACKEND_TOKEN || '');
   await startSandbox();
-  server.listen(Number(process.env.PORT || 4320),'0.0.0.0',()=>console.log('Rehearsal backend ready; providers are loopback-only.'));
+  server.listen(Number(process.env.PORT || 4320),process.env.HOST || '127.0.0.1',()=>console.log('Rehearsal backend ready; providers are loopback-only.'));
 }
