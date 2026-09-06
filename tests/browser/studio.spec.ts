@@ -1,4 +1,6 @@
 import { test, expect } from "@playwright/test";
+import { readFile } from 'node:fs/promises';
+import { PDFDocument } from 'pdf-lib';
 
 test("failure, recovery, event details, export, comparison and persisted history", async ({
   page,
@@ -27,6 +29,13 @@ test("failure, recovery, event details, export, comparison and persisted history
   await page.getByRole("button", { name: "Download run report" }).click();
   const download = await downloadPromise;
   expect(download.suggestedFilename()).toContain("lost-response-recovery");
+  const pdfPromise = page.waitForEvent('download');
+  await page.getByRole('button', { name: 'Download PDF run report', exact: true }).click();
+  const pdfDownload = await pdfPromise;
+  expect(pdfDownload.suggestedFilename()).toMatch(/lost-response-recovery.*\.pdf$/);
+  const report = await PDFDocument.load(await readFile((await pdfDownload.path())!));
+  expect(report.getAuthor()).toBe('Tharinda.dev');
+  expect(report.getPageCount()).toBeGreaterThanOrEqual(3);
   await page
     .getByRole("button", { name: "Compare strategies", exact: true })
     .click();
@@ -110,4 +119,18 @@ test("invalid input and cross-origin requests are rejected", async ({
   });
   expect(local.status()).toBe(200);
   expect(await local.text()).toContain('"outcome":"passed"');
+});
+
+test('illustrated project guide is a real PDF and developer credit is visible', async ({ page, request }) => {
+  await page.goto('/', { waitUntil: 'domcontentloaded' });
+  await page.getByRole('button', { name: 'Field guide', exact: true }).click();
+  await expect(page.getByText('Understand the whole system.', { exact: false })).toBeVisible();
+  await expect(page.locator('.developer-credit')).toContainText('Tharinda.dev');
+  const link = page.getByRole('link', { name: 'Download project guide' });
+  await expect(link).toBeVisible();
+  const response = await request.get((await link.getAttribute('href'))!);
+  expect(response.status()).toBe(200);
+  const pdf = await PDFDocument.load(await response.body());
+  expect(pdf.getPageCount()).toBeGreaterThanOrEqual(10);
+  expect(pdf.getAuthor()).toBe('Tharinda.dev');
 });
