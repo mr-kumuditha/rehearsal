@@ -6,7 +6,7 @@ The public deployment uses Vercel for the web interface and a DigitalOcean VPS f
 Browser → Vercel /api/runs → authenticated HTTPS → VPS backend
                                                   ├─ inventory HTTP
                                                   ├─ payment HTTP
-                                                  ├─ delivery HTTP
+                                                  ├─ WSO2 HTTPS → delivery HTTP
                                                   └─ SQLite on persistent disk
 ```
 
@@ -14,7 +14,9 @@ Browser → Vercel /api/runs → authenticated HTTPS → VPS backend
 
 The web app is at https://rehearsal-kumuditha.vercel.app. The backend origin is https://rehearsal-api.178-128-219-13.sslip.io. Both are connected; see [the verification record](VERIFICATION.md) for the live checks and remaining limits.
 
-The current VPS has about 454 MB of usable memory. It runs Node.js 24.20.0 as a systemd service, with Nginx terminating HTTPS. Docker is an optional deployment path, not the runtime used on this server. The backend source release is `def6b05`; its files are under `/opt/rehearsal/releases/def6b05`, selected through `/opt/rehearsal/current`.
+The VPS was resized to 4 GB RAM, two CPUs and a 78 GB filesystem. It runs Node.js 24.20.0 as a systemd service, with Nginx terminating HTTPS. Docker is an optional path, not this server's runtime. The backend source release is `7a9ee7d`, selected through `/opt/rehearsal/current`. The previous release `def6b05` remains available for rollback.
+
+WSO2 API Manager 4.7.0 runs separately as the `wso2` user with Java 21. Its control plane and gateway ports are private; UFW allows public ports 22, 80 and 443 only, on IPv4 and IPv6. The runner reaches delivery through the private HTTPS gateway, while inventory and payment stay direct. See [WSO2 setup and credential maintenance](WSO2.md). The server reboot during the resize brought the pre-existing backend and Nginx back online; the newly installed gateway has not yet been tested through a full VPS reboot.
 
 The backend hostname uses [sslip.io](https://github.com/cunnie/sslip.io), whose DNS resolves the address encoded in the hostname. This is an external DNS dependency for the portfolio demo. To move to a domain you control, point its A record to the VPS, obtain a certificate, update the Nginx hostname and set `BACKEND_URL` in Vercel before redeploying.
 
@@ -27,6 +29,8 @@ Inspect the existing server before installing or restarting anything. In particu
 The checked-in `vps-backend/systemd/rehearsal.service` runs as the dedicated `rehearsal` user. Its HTTP listener and all three providers bind to loopback. The service starts on boot, restarts after a failure and has a 192 MB memory limit. Application source stays read-only; reports are stored under `/var/lib/rehearsal/runs.sqlite`, outside the release directory.
 
 The server's private credential lives in `/etc/rehearsal/backend.env` with root-only read access. systemd reads that file before starting the service. The same value is stored as the production `BACKEND_TOKEN` secret in Vercel. It is never included in the source archive or sent to the browser.
+
+The optional root-only `/etc/rehearsal/gateway.env` sets the delivery URL, OAuth client credentials and Node's extra certificate trust. Only the backend loads this file. Keep it separate from API Manager administration credentials, and do not copy either file into a Git archive.
 
 For a fresh server, install Node.js 24 from the [official release distribution](https://nodejs.org/dist/latest-v24.x/) and verify the archive against its published SHA-256 checksum. The service expects the runtime at `/opt/rehearsal/node/bin/node` and source at `/opt/rehearsal/current`. Create the `rehearsal` system user, install the unit in `/etc/systemd/system/rehearsal.service`, provision the credential privately, then run `systemctl daemon-reload` and `systemctl enable --now rehearsal`.
 
