@@ -70,6 +70,10 @@ The public firewall allows 22/80/443; WSO2 ports are private. API Manager is a s
 - Controls could be clicked before React attached their handlers. Initial navigation and scenario controls stay disabled until the UI is interactive.
 - A null request body previously escaped the validation guard. It now receives HTTP 400 and has browser-API regression coverage.
 
+## PDF export and interface update
+
+The current web update adds PDF run downloads and a 14-page illustrated project guide, with Tharinda.dev credit. Local verification passed: 25 automated tests, TypeScript checks, and five browser tests. The browser checks download and parse an actual PDF, verify its author and page count, check the guide link, and retain the earlier scenario, comparison, history and mobile/reduced-motion coverage. Both the guide and a real-run sample were rendered for visual inspection and text/attachment checks. See [PDF exports and source assets](PDF-EXPORTS.md).
+
 ## Not verified
 
 Ballerina execution, a second clean-server gateway installation and upstream PR acceptance remain unverified. The Ballerina archive is under ignored `work`, but downloading a runtime is not integrating it. No internship points are claimed by this record; WSO2 decides eligibility.
