@@ -4,7 +4,7 @@ import {randomUUID} from 'node:crypto';
 import {mkdtempSync,rmSync} from 'node:fs';
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
-import {createBackend} from '../backend/server.ts';
+import {createBackend} from '../vps-backend/server.ts';
 import {startSandbox} from '../sandbox/server.ts';
 import {listRuns,saveRun} from '../src/lib/store.ts';
 import {sameOrigin,proxyBackend} from '../src/lib/backend-proxy.ts';
