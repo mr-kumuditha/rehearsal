@@ -50,6 +50,7 @@ export default function Home() {
     { name: string; online: boolean; address?: string }[]
   >([]);
   const [transport, setTransport] = useState("direct-http");
+  const [managedServices, setManagedServices] = useState<string[]>([]);
   const [location, setLocation] = useState('local');
   const [selectedEvent, setSelectedEvent] = useState<RunEvent | null>(null);
   const running = useRef(false);
@@ -62,9 +63,11 @@ export default function Home() {
       const data = await r.json();
       setServices(data.services);
       setTransport(data.transport);
+      setManagedServices(data.gatewayServices || []);
       setLocation(data.location || 'local');
     } catch {
       setServices([]);
+      setManagedServices([]);
     }
   }
   async function history() {
@@ -368,7 +371,7 @@ export default function Home() {
                   <span className="workflow-transport">
                     {transport === "direct-http"
                       ? "Direct HTTP · gateway not connected"
-                      : "Gateway transport configured"}
+                      : `Gateway route · ${managedServices.join(', ') || 'checking'}`}
                   </span>
                 </div>
               </section>
@@ -810,24 +813,27 @@ export default function Home() {
               </section>
               <section className="surface">
                 <span className="eyebrow muted">WSO2 INTEGRATION</span>
-                <h2>A clear path to the gateway</h2>
+                <h2>The managed API boundary</h2>
                 <div className="integration-state">
                   <Unplug size={25} />
                   <strong>
                     {transport === "direct-http"
                       ? "Not connected"
-                      : "Configured · verify gateway routing"}
+                      : managedServices.length > 0 && managedServices.every(name => services.some(service => service.name === name && service.online))
+                        ? "Gateway route online"
+                        : "Gateway route needs attention"}
                   </strong>
                 </div>
                 <p className="body-copy">
-                  This build runs directly against sandbox APIs. WSO2 API
-                  Manager can proxy the same contract. Configure service URLs
-                  and a server-side gateway token using the integration guide.
+                  {transport === "direct-http"
+                    ? "This local setup calls the sandbox APIs directly. The public deployment routes delivery through WSO2 API Manager 4.7.0; inventory and payment stay on direct HTTP."
+                    : `Managed services: ${managedServices.join(', ') || 'checking'}. Other providers stay on direct HTTP. OAuth credentials remain on the backend, never in your browser.`}
                 </p>
                 <p className="body-copy">
-                  Gateway settings alone do not prove WSO2 enforcement. Verify
-                  token rejection and gateway rate limits before claiming
-                  integration is complete.
+                  A health check confirms connectivity, not every policy.
+                  The integration notes record separate token-rejection and
+                  gateway-quota checks. The quota probe is isolated from
+                  the sandbox failures you select here.
                 </p>
                 <button
                   className="button secondary"
