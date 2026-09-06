@@ -9,6 +9,7 @@ User=rehearsal
 Group=rehearsal
 WorkingDirectory=/opt/rehearsal/current
 EnvironmentFile=/etc/rehearsal/backend.env
+EnvironmentFile=-/etc/rehearsal/gateway.env
 Environment=NODE_ENV=production
 Environment=HOST=127.0.0.1
 Environment=PORT=4320
