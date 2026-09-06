@@ -1,0 +1,19 @@
+services:
+  rehearsal:
+    build:
+      context: ..
+      dockerfile: backend/Dockerfile
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:4320:4320"
+    environment:
+      BACKEND_TOKEN: ${BACKEND_TOKEN:?Set a unique backend token outside Git}
+      REHEARSAL_DATA_DIR: /data
+    volumes:
+      - rehearsal-data:/data
+    mem_limit: 512m
+    cpus: 1
+    security_opt:
+      - no-new-privileges:true
+volumes:
+  rehearsal-data:
