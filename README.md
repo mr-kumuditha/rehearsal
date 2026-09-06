@@ -8,6 +8,8 @@ It is a working engineering prototype, not a production chaos platform. No real 
 
 [Open the live studio](https://rehearsal-kumuditha.vercel.app). The public version runs the same HTTP experiments on a DigitalOcean VPS and saves reports in a browser-specific workspace. It is ready to try without installing anything.
 
+[Download the illustrated project guide](https://rehearsal-kumuditha.vercel.app/docs/rehearsal-project-guide.pdf): 14 pages of plain-English explanations, actual screenshots, architecture and data-flow diagrams, observed results and deployment notes. Design and development: **Tharinda.dev**.
+
 ## Try the first experiment
 
 Use Node.js 24. If you use nvm, run `nvm use` in this folder first.
@@ -42,7 +44,8 @@ The duplicate-event scenario replays a trigger inside the runner. It is not a we
 ## What is here
 
 - A responsive studio, live event trace and keyboard-accessible event details.
-- Baseline/recovery comparison, saved run history and JSON evidence exports.
+- Baseline/recovery comparison, committed-operation charts and saved run history.
+- Downloadable PDF run reports with a summary, ledger chart, event timeline and complete trace; original JSON remains available separately and as a PDF attachment.
 - Three HTTP providers with per-run isolation and idempotency handling.
 - A TypeScript runner that evaluates four business rules.
 - Event-by-event trace playback, active workflow nodes and directional flow animation. Reduced-motion preferences disable the animation and presentation delay; recorded server timings are never changed.
@@ -77,6 +80,7 @@ Default ports: web `3040`, inventory `4311`, payment `4312`, delivery `4313`. Al
 - [Demo walkthrough](docs/DEMO.md): a short explanation you can practice in your own words.
 - [Verification record](docs/VERIFICATION.md): checks performed, issues found and remaining gaps.
 - [Vercel and DigitalOcean deployment](docs/DEPLOYMENT.md): hosted backend, private credentials, persistent storage and live acceptance checks.
+- [PDF exports and guide maintenance](docs/PDF-EXPORTS.md): download behavior, privacy, source assets and document regeneration.
 
 ## Known limits
 
