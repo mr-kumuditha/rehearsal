@@ -5,6 +5,7 @@ import { endpoints, runRehearsal } from '../src/lib/engine.ts';
 import { listRuns, saveRun } from '../src/lib/store.ts';
 import { scenarios } from '../src/lib/types.ts';
 import { startSandbox } from '../sandbox/server.ts';
+import { gatewayHeaders, gatewayServices, gatewayTransport } from '../src/lib/gateway.ts';
 
 // This service is reached only by the web app's server-side proxy.
 // The three providers stay on loopback and retain real HTTP behavior.
@@ -20,10 +21,10 @@ export function createBackend(token: string, bases = endpoints()) {
     if (!timingSafeEqual(expected,digest(req.headers.authorization || ''))) return reply(401,{error:'Unauthorized'});
     if (path === '/health' && req.method === 'GET') {
       const services=await Promise.all(Object.entries(bases).map(async ([name,url])=>{
-        try {const response=await fetch(`${url}/health`,{signal:AbortSignal.timeout(1500)});return {name,online:response.ok,address:`Hosted ${name} sandbox`};}
+        try {const response=await fetch(`${url}/health`,{headers:await gatewayHeaders(name),signal:AbortSignal.timeout(3000)});return {name,online:response.ok,address:gatewayServices().some(service => service === name) ? `Gateway → ${name} sandbox` : `Hosted ${name} sandbox`};}
         catch {return {name,online:false,address:`Hosted ${name} sandbox`};}
       }));
-      return reply(200,{services,transport:'direct-http',location:'hosted',ballerina:false});
+      return reply(200,{services,transport:gatewayTransport(),gatewayServices:gatewayServices(),location:'hosted',ballerina:false});
     }
     const workspace=req.headers['x-rehearsal-workspace'];
     if (typeof workspace !== 'string' || !/^[a-f0-9-]{36}$/.test(workspace)) return reply(400,{error:'Valid workspace required'});
