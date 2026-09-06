@@ -10,7 +10,7 @@
     "dev": "node scripts/dev.mjs",
     "web": "next dev --webpack -p 3040 -H 127.0.0.1",
     "sandbox": "node --experimental-strip-types sandbox/server.ts",
-    "backend": "node --experimental-strip-types backend/server.ts",
+    "backend": "node --experimental-strip-types vps-backend/server.ts",
     "build": "next build --webpack",
     "start": "next start -p 3040 -H 127.0.0.1",
     "typecheck": "tsc --noEmit",
