@@ -11,6 +11,7 @@
     "web": "next dev --webpack -p 3040 -H 127.0.0.1",
     "sandbox": "node --experimental-strip-types sandbox/server.ts",
     "backend": "node --experimental-strip-types vps-backend/server.ts",
+    "prebuild": "node scripts/check-public-assets.mjs",
     "build": "next build --webpack",
     "start": "next start -p 3040 -H 127.0.0.1",
     "typecheck": "tsc --noEmit",
