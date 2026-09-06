@@ -26,4 +26,4 @@ Open **Compare strategies** and download one report. Show how the trace, ledger 
 
 “This prototype tests a fixed order contract over real HTTP. Provider ledgers are in memory and completed reports are saved locally. It demonstrates these specific recovery strategies; it does not prove every distributed system is safe.”
 
-Only describe a WSO2 or Ballerina component as live once you can show the running integration. End by explaining one concrete next step, such as a verified gateway security boundary or durable provider idempotency storage.
+On the hosted demo, show the delivery gateway route: WSO2 API Manager authenticates requests before forwarding them to the sandbox. Show the separate token-rejection and quota checks in the verification record. Explain why those checks do not make a badly keyed retry safe. Inventory and payment still use direct HTTP, and Ballerina is not live. End with a concrete next step, such as durable provider idempotency storage.
