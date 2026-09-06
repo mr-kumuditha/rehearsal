@@ -1,0 +1,10 @@
+# The public Vercel service is the Next.js web app. The real HTTP backend is
+# deployed separately to DigitalOcean; keep its source in GitHub, not in the
+# Vercel build upload.
+backend/
+sandbox/
+tests/
+docs/
+work/
+*.command
+public/fonts/*-OFL.txt
