@@ -50,7 +50,7 @@ The duplicate-event scenario replays a trigger inside the runner. It is not a we
 - A credential-protected hosted backend with workspace-scoped history, a lightweight systemd deployment and an optional Docker setup.
 - Integration and architecture notes written for someone reading the project for the first time.
 
-WSO2 API Manager is **not connected** in the default build. Setting a gateway token is configuration, not evidence of gateway enforcement. See [the WSO2 integration notes](docs/WSO2.md) before describing this as a completed WSO2 project.
+The hosted deployment routes delivery through **WSO2 API Manager 4.7.0**, using server-side OAuth client credentials. Inventory and payment remain direct HTTP; a default local checkout still needs no gateway. Separate live checks verify token rejection and gateway throttling without confusing them with the sandbox's injected failures. See [the WSO2 integration and evidence](docs/WSO2.md). Ballerina is not connected.
 
 ## Development
 
