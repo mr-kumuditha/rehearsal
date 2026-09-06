@@ -1,0 +1,28 @@
+[Unit]
+Description=WSO2 API Manager for Rehearsal
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=simple
+User=wso2
+Group=wso2
+WorkingDirectory=/opt/wso2/wso2am-4.7.0
+EnvironmentFile=/etc/rehearsal/apim-admin.env
+Environment=JAVA_HOME=/opt/wso2/java
+Environment="JVM_MEM_OPTS=-Xms512m -Xmx2048m"
+ExecStart=/opt/wso2/wso2am-4.7.0/bin/api-manager.sh
+Restart=on-failure
+RestartSec=10
+TimeoutStopSec=90
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectHome=true
+ProtectSystem=full
+MemoryHigh=2800M
+MemoryMax=3G
+LimitNOFILE=65536
+
+[Install]
+WantedBy=multi-user.target
