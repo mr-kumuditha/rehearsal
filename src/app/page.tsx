@@ -70,7 +70,14 @@ export default function Home() {
   async function history() {
     try {
       const r = await fetch("/api/runs");
-      if (!r.ok) throw Error();
+      if (!r.ok) {
+        const data = await r.json().catch(() => null);
+        if (r.status === 503) {
+          setError(data?.error || "The hosted backend is not connected yet. The interface is online; complete VPS setup to run rehearsals.");
+          return;
+        }
+        throw Error(data?.error || "Run history could not be loaded.");
+      }
       setRuns(await r.json());
     } catch {
       setError("Run history could not be loaded. Try refreshing.");
