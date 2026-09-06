@@ -1,0 +1,34 @@
+{
+  "name": "rehearsal",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "dev": "node scripts/dev.mjs",
+    "web": "next dev --webpack -p 3040 -H 127.0.0.1",
+    "sandbox": "node --experimental-strip-types sandbox/server.ts",
+    "backend": "node --experimental-strip-types backend/server.ts",
+    "build": "next build --webpack",
+    "start": "next start -p 3040 -H 127.0.0.1",
+    "typecheck": "tsc --noEmit",
+    "test": "tsx --test tests/*.test.ts",
+    "test:e2e": "playwright test"
+  },
+  "dependencies": {
+    "lucide-react": "^1.41.0",
+    "next": "^16.3.4",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.63.0",
+    "@types/node": "^26.4.1",
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.7",
+    "tsx": "^4.23.13",
+    "typescript": "^7.0.2"
+  }
+}
