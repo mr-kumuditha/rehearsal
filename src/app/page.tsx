@@ -14,6 +14,7 @@ import {
   Code2,
   CreditCard,
   FlaskConical,
+  FileText,
   GitBranch,
   History,
   Layers3,
@@ -46,6 +47,8 @@ export default function Home() {
   const [result, setResult] = useState<Run | null>(null);
   const [runs, setRuns] = useState<Run[]>([]);
   const [error, setError] = useState("");
+  const [exporting, setExporting] = useState(false);
+  const [exportNotice, setExportNotice] = useState('');
   const [services, setServices] = useState<
     { name: string; online: boolean; address?: string }[]
   >([]);
@@ -181,6 +184,25 @@ export default function Home() {
     a.click();
     URL.revokeObjectURL(url);
   }
+  async function downloadPdf(run: Run) {
+    if (exporting) return;
+    setExporting(true);
+    setExportNotice('Preparing your PDF report…');
+    try {
+      const { createRunPdf } = await import('@/lib/report-pdf');
+      const bytes = await createRunPdf(run);
+      const url = URL.createObjectURL(new Blob([new Uint8Array(bytes)], { type: 'application/pdf' }));
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `rehearsal-${run.scenario}-${run.strategy}-${run.id.slice(0, 8)}.pdf`;
+      document.body.appendChild(a);
+      a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 30000);
+      setExportNotice('PDF prepared. Your download is ready.');
+    } catch {
+      setExportNotice('PDF export failed. Please try again, or download the JSON evidence.');
+    } finally { setExporting(false); }
+  }
   const nav = [
     { id: "studio", icon: FlaskConical, title: "Rehearsal studio" },
     { id: "history", icon: History, title: "Run history" },
@@ -246,7 +268,7 @@ export default function Home() {
           <div className="profile">
             <span>KT</span>
             <div>
-              Your engineering lab<small>Rehearsal · v0.1</small>
+              Tharinda.dev<small>Design & development</small>
             </div>
             <CircleDot size={15} />
           </div>
@@ -284,6 +306,8 @@ export default function Home() {
                         : "A small guide to the things a timeout cannot tell you."}
               </p>
             </div>
+            <div className="heading-actions">
+              <a className="button primary" href="/docs/rehearsal-project-guide.pdf" download><FileText size={16} /> Project PDF</a>
             {view === "studio" && (
               <button
                 className="button secondary"
@@ -293,7 +317,9 @@ export default function Home() {
                 How it works
               </button>
             )}
+            </div>
           </div>
+          <div className="export-notice" role="status" aria-live="polite">{exportNotice}</div>
           {error && (
             <div className="error-banner" role="alert">
               {error}
@@ -304,6 +330,11 @@ export default function Home() {
           )}
           {view === "studio" && (
             <>
+              {!result && !busy && <section className="start-strip" aria-label="Your first experiment">
+                <div><span>01</span><p><strong>Introduce a failure</strong>Choose one controlled fault.</p></div>
+                <div><span>02</span><p><strong>Change the decision</strong>Compare baseline and recovery.</p></div>
+                <div><span>03</span><p><strong>Keep the evidence</strong>Export an illustrated PDF report.</p></div>
+              </section>}
               <section className={`workflow-panel ${busy ? 'is-running' : ''}`} aria-busy={busy}>
                 <div className="section-top">
                   <div>
@@ -534,12 +565,17 @@ export default function Home() {
                         ? `Run ${result.id.slice(0, 8)} · ${result.duration}ms · ${result.transport}`
                         : "Waiting for a rehearsal"}
                     {result && (
+                      <div className="trace-export-actions">
+                      <button onClick={() => void downloadPdf(result)} disabled={exporting} aria-label="Download PDF run report">
+                        {exporting ? <Loader2 size={15} className="spin" /> : <FileText size={15} />} PDF
+                      </button>
                       <button
                         onClick={() => download(result)}
                         aria-label="Download run report"
                       >
-                        <ArrowDownToLine size={16} />
+                        <ArrowDownToLine size={16} /> JSON
                       </button>
+                      </div>
                     )}
                   </div>
                 </section>
@@ -613,6 +649,11 @@ export default function Home() {
                   </div>
                 )}
               </section>
+              {result && <section className="evidence-banner">
+                <span className="evidence-icon"><FileText size={27} /></span>
+                <div><span className="eyebrow">YOUR EXPERIMENT, EXPLAINED</span><h2>Take the evidence with you.</h2><p>A clear summary, ledger chart and complete trace. Ready to share.</p></div>
+                <button className="button primary" disabled={exporting} onClick={() => void downloadPdf(result)}>{exporting ? <Loader2 size={16} className="spin" /> : <ArrowDownToLine size={16} />} Export PDF</button>
+              </section>}
             </>
           )}
           {view === "history" && (
@@ -737,9 +778,9 @@ export default function Home() {
                           ))}
                           <div className="compare-footer">
                             <span>{run.duration}ms elapsed</span>
-                            <button onClick={() => download(run)}>
-                              <ArrowDownToLine size={15} />
-                              Report
+                            <button disabled={exporting} onClick={() => void downloadPdf(run)}>
+                              <FileText size={15} />
+                              PDF report
                             </button>
                           </div>
                         </>
@@ -760,6 +801,16 @@ export default function Home() {
                   );
                 })}
               </div>
+              <section className="surface ledger-comparison" aria-label="Committed operation comparison">
+                <span className="eyebrow muted">THE EFFECTS THAT MATTER</span><h2>One order. How many commitments?</h2>
+                <p className="body-copy">Target: one operation per provider. Counts come from the latest run of each strategy.</p>
+                <div className="chart-legend"><span className="baseline-key">Baseline</span><span className="recovery-key">Recovery</span></div>
+                {(['reservations', 'authorizations', 'deliveries'] as const).map((key, i) => {
+                  const pair = (['baseline','recovery'] as const).map(mode => runs.find(r => r.scenario === scenario && r.strategy === mode));
+                  const max = Math.max(2, ...pair.map(r => r?.ledger[key] || 0));
+                  return <div className="ledger-chart-row" key={key}><strong>{['Stock reservations','Payment authorizations','Delivery bookings'][i]}</strong><div>{pair.map((r, j) => <div className={`ledger-bar-row ${j ? 'recovery' : 'baseline'}`} key={j}><span className="ledger-bar-track" aria-hidden="true"><span style={{width:`${(r?.ledger[key] || 0) / max * 100}%`}} /></span><span className="bar-value">{r ? r.ledger[key] : 'Not run'}</span><span className="sr-only">{j ? 'Recovery' : 'Baseline'}</span></div>)}</div></div>;
+                })}
+              </section>
               <p className="footnote">
                 Each run uses a fresh sandbox ledger. Durations are measured
                 on the execution host and can vary; they are not production benchmarks.
@@ -845,6 +896,11 @@ export default function Home() {
             </div>
           )}
           {view === "guide" && (
+            <>
+            <section className="document-feature">
+              <div className="guide-cover" aria-hidden="true"><span>REHEARSAL / FIELD NOTES</span><strong>When the<br />reply goes<br /><em>missing.</em></strong><div className="cover-route"><i /><b /><i /><b /><i /></div><small>PROJECT GUIDE · THARINDA.DEV</small></div>
+              <div><span className="eyebrow">THE COMPLETE PROJECT GUIDE</span><h2>Understand the whole system.<br />One visual story at a time.</h2><p>From your first experiment to the gateway boundary. An illustrated guide with real screenshots, architecture diagrams, observed results and practical setup notes.</p><div className="document-topics"><span>Architecture</span><span>Recovery patterns</span><span>Evidence & limits</span></div><a className="button primary" href="/docs/rehearsal-project-guide.pdf" download><ArrowDownToLine size={17} /> Download project guide</a><small>PDF · English · Developed by Tharinda.dev</small></div>
+            </section>
             <div className="guide-layout">
               <section className="surface prose">
                 <span className="eyebrow muted">THE IDEA</span>
@@ -879,16 +935,16 @@ export default function Home() {
                 </p>
                 <h3>Why WSO2 belongs here</h3>
                 <p>
-                  API Manager provides the managed API boundary; Ballerina is
-                  the planned integration runtime. The current runner is
-                  TypeScript so the lab is usable before those runtimes are
-                  configured. See docs/WSO2.md for the setup and verification
-                  boundary.
+                  The hosted deployment routes delivery through WSO2 API Manager.
+                  Inventory and payment stay on direct HTTP. Separate tests verify
+                  token rejection and gateway quotas. The runner is TypeScript;
+                  Ballerina is a planned component, not a live integration.
                 </p>
                 <h3>What comes next</h3>
                 <p>
-                  Ballerina workflow execution, verified gateway enforcement,
-                  custom contracts, persisted provider ledgers and team access.
+                  An independent Ballerina ledger auditor, custom contracts,
+                  persisted provider ledgers and team access. These are planned,
+                  not features you should expect in the current demo.
                 </p>
               </section>
               <aside className="surface guide-aside">
@@ -904,12 +960,13 @@ export default function Home() {
                 <small>Exercises failures and recovery over HTTP.</small>
               </aside>
             </div>
+            </>
           )}
           <footer className="page-footer">
             <span>
               <GitBranch size={13} /> REHEARSAL
             </span>
-            <span>Small failures. Better decisions.</span>
+            <span className="developer-credit">Designed & developed by <strong>Tharinda.dev</strong></span>
             <span>v0.1 · {location === 'hosted' ? 'hosted HTTP sandbox' : 'local sandbox'}</span>
           </footer>
         </main>
