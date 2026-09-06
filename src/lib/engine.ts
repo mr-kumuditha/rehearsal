@@ -2,6 +2,7 @@ import { randomUUID } from "node:crypto";
 import { performance } from "node:perf_hooks";
 import { scenarios } from "./types.ts";
 import type { Run, RunEvent, Service, ScenarioId, Strategy } from "./types.ts";
+import { gatewayHeaders, gatewayTransport } from "./gateway.ts";
 
 export const endpoints = () => ({
   inventory: process.env.INVENTORY_URL || "http://127.0.0.1:4311",
@@ -44,8 +45,6 @@ export async function runRehearsal(
     "Content-Type": "application/json",
     "X-Rehearsal-Run": id,
   };
-  if (process.env.GATEWAY_TOKEN)
-    headers.Authorization = `Bearer ${process.env.GATEWAY_TOKEN}`;
   const call = async (
     service: keyof typeof bases,
     path: string,
@@ -54,7 +53,7 @@ export async function runRehearsal(
   ) =>
     fetch(`${bases[service]}${path}`, {
       method: body ? "POST" : "GET",
-      headers,
+      headers: { ...headers, ...await gatewayHeaders(service) },
       ...(body ? { body: JSON.stringify(body) } : {}),
       signal: AbortSignal.timeout(timeout),
     });
@@ -266,6 +265,6 @@ export async function runRehearsal(
     ledger,
     checks,
     outcome,
-    transport: process.env.GATEWAY_TOKEN ? "gateway-configured" : "direct-http",
+    transport: gatewayTransport(),
   };
 }
