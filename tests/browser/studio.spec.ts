@@ -106,7 +106,7 @@ test("invalid input and cross-origin requests are rejected", async ({
   expect(cross.status()).toBe(403);
   const local = await request.post("/api/runs", {
     data: { scenario: "duplicate-event", strategy: "recovery" },
-    headers: { Origin: "http://127.0.0.1:3040" },
+    headers: { Origin: new URL(test.info().project.use.baseURL!).origin },
   });
   expect(local.status()).toBe(200);
   expect(await local.text()).toContain('"outcome":"passed"');
