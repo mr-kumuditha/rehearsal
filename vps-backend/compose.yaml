@@ -2,7 +2,7 @@ services:
   rehearsal:
     build:
       context: ..
-      dockerfile: backend/Dockerfile
+      dockerfile: vps-backend/Dockerfile
     restart: unless-stopped
     ports:
       - "127.0.0.1:4320:4320"
