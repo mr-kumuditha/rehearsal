@@ -6,6 +6,8 @@ Rehearsal sends an order through inventory, payment and delivery sandbox APIs. Y
 
 It is a working engineering prototype, not a production chaos platform. No real payments, deliveries or customer data are involved. The default setup runs locally; the hosted architecture pairs a Vercel web app with a real HTTP backend on a VPS.
 
+[Open the live studio](https://rehearsal-kumuditha.vercel.app). The public version runs the same HTTP experiments on a DigitalOcean VPS and saves reports in a browser-specific workspace. It is ready to try without installing anything.
+
 ## Try the first experiment
 
 Use Node.js 24. If you use nvm, run `nvm use` in this folder first.
@@ -45,7 +47,7 @@ The duplicate-event scenario replays a trigger inside the runner. It is not a we
 - A TypeScript runner that evaluates four business rules.
 - Event-by-event trace playback, active workflow nodes and directional flow animation. Reduced-motion preferences disable the animation and presentation delay; recorded server timings are never changed.
 - SQLite storage for completed reports, under `.rehearsal/runs.sqlite`.
-- A credential-protected hosted backend with workspace-scoped history and a persistent-volume Docker setup.
+- A credential-protected hosted backend with workspace-scoped history, a lightweight systemd deployment and an optional Docker setup.
 - Integration and architecture notes written for someone reading the project for the first time.
 
 WSO2 API Manager is **not connected** in the default build. Setting a gateway token is configuration, not evidence of gateway enforcement. See [the WSO2 integration notes](docs/WSO2.md) before describing this as a completed WSO2 project.
@@ -62,6 +64,8 @@ npm run build        # Production web build
 The browser tests reuse a running dev server or start one. They create real local run reports, so test runs may appear in history. For a production-mode local check, run `npm run sandbox` in one terminal and `npm start` in another after building. The app is intentionally local-only; this is not a public deployment recipe.
 
 Browser tests default to an installed Google Chrome (`chrome`). If you do not have Chrome, run `npx playwright install chromium`, then `PLAYWRIGHT_CHANNEL=chromium npm run test:e2e`. Fonts are served locally; their licenses are in `public/fonts`.
+
+To run the same browser checks against a deployed app, set `PLAYWRIGHT_BASE_URL` to its HTTPS origin. For example: `PLAYWRIGHT_BASE_URL=https://rehearsal-kumuditha.vercel.app npm run test:e2e`. These checks create real sandbox reports in isolated visitor workspaces.
 
 Default ports: web `3040`, inventory `4311`, payment `4312`, delivery `4313`. All listeners should stay on loopback. If a port is occupied, identify its owner rather than killing an unrelated process. `.env.example` shows the optional service URL overrides. Restart the app after changing `.env.local`.
 
