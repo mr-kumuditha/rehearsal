@@ -1,0 +1,59 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Rehearsal Delivery",
+    "version": "1.0.0",
+    "description": "An isolated delivery sandbox for testing ambiguous timeouts, duplicate events and bounded retries. No real deliveries are created."
+  },
+  "servers": [{"url": "https://localhost:8243/rehearsal/delivery/1.0.0"}],
+  "security": [{"sandboxOAuth": []}],
+  "paths": {
+    "/health": {
+      "get": {
+        "operationId": "deliveryHealth",
+        "summary": "Check the provider without creating an operation",
+        "responses": {"200": {"description": "Delivery sandbox is available"}}
+      }
+    },
+    "/execute": {
+      "post": {
+        "operationId": "bookDelivery",
+        "summary": "Book or replay a delivery within one rehearsal",
+        "parameters": [{"$ref": "#/components/parameters/RunId"}],
+        "requestBody": {
+          "required": true,
+          "content": {"application/json": {"schema": {
+            "type": "object",
+            "required": ["key", "scenario"],
+            "properties": {
+              "key": {"type": "string", "minLength": 1, "description": "Stable operation key; deduplicated only inside this run"},
+              "scenario": {"type": "string", "enum": ["lost-response", "duplicate-event", "rate-limit", "invalid-response"]}
+            }
+          }}}
+        },
+        "responses": {
+          "200": {"description": "Existing delivery returned for the same operation key"},
+          "201": {"description": "Delivery committed; the lost-response scenario delays the reply by 650 ms"},
+          "400": {"description": "Invalid operation key, run header or request body"},
+          "429": {"description": "Injected provider quota failure, distinct from a WSO2 gateway quota", "headers": {"Retry-After": {"schema": {"type": "integer", "example": 1}}}}
+        }
+      }
+    },
+    "/ledger": {
+      "get": {
+        "operationId": "deliveryLedger",
+        "summary": "Inspect committed deliveries for one run",
+        "parameters": [{"$ref": "#/components/parameters/RunId"}],
+        "responses": {"200": {"description": "Per-run provider ledger", "content": {"application/json": {"schema": {
+          "type": "object", "required": ["operations"], "properties": {"operations": {"type": "array", "items": {
+            "type": "object", "required": ["id", "key"], "properties": {"id": {"type": "string"}, "key": {"type": "string"}}
+          }}}
+        }}}}, "400": {"description": "Missing or invalid run header"}}
+      }
+    }
+  },
+  "components": {
+    "parameters": {"RunId": {"name": "X-Rehearsal-Run", "in": "header", "required": true, "schema": {"type": "string", "pattern": "^[a-zA-Z0-9-]{1,100}$"}}},
+    "securitySchemes": {"sandboxOAuth": {"type": "oauth2", "flows": {"clientCredentials": {"tokenUrl": "https://localhost:9443/oauth2/token", "scopes": {}}}}}
+  }
+}
