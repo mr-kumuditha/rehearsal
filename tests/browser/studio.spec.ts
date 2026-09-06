@@ -1,0 +1,113 @@
+import { test, expect } from "@playwright/test";
+
+test("failure, recovery, event details, export, comparison and persisted history", async ({
+  page,
+}) => {
+  const errors: string[] = [];
+  page.on("pageerror", (e) => errors.push(e.message));
+  await page.goto("/", { waitUntil: "domcontentloaded" });
+  await expect(
+    page.getByRole("button", { name: "Run rehearsal" }),
+  ).toBeEnabled();
+  await page.getByRole("button", { name: "Run rehearsal" }).click();
+  await expect(page.getByText("3/4 CHECKS PASSED")).toBeVisible();
+  await expect(
+    page.getByText("2 delivery booking(s)", { exact: true }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "Run with recovery" }).click();
+  await expect(page.getByText("4/4 CHECKS PASSED")).toBeVisible();
+  await expect(
+    page.getByText("1 delivery booking(s)", { exact: true }),
+  ).toBeVisible();
+  await page.locator(".event-row").first().click();
+  await expect(page.locator("dialog")).toBeVisible();
+  await page.keyboard.press("Escape");
+  await expect(page.locator("dialog")).toHaveCount(0);
+  const downloadPromise = page.waitForEvent("download");
+  await page.getByRole("button", { name: "Download run report" }).click();
+  const download = await downloadPromise;
+  expect(download.suggestedFilename()).toContain("lost-response-recovery");
+  await page
+    .getByRole("button", { name: "Compare strategies", exact: true })
+    .click();
+  await expect(
+    page.getByRole("heading", { name: "Baseline behavior" }),
+  ).toBeVisible();
+  await expect(page.locator(".big-result.passed")).toContainText("4");
+  await page.getByRole("button", { name: /Run history/ }).click();
+  const count = await page.locator(".history-row").count();
+  expect(count).toBeGreaterThanOrEqual(2);
+  await page.reload({ waitUntil: "domcontentloaded" });
+  await page.getByRole("button", { name: /Run history/ }).click();
+  await expect(page.locator(".history-row")).toHaveCount(count);
+  await page.locator(".history-row").first().click();
+  await expect(page.getByText("4/4 CHECKS PASSED")).toBeVisible();
+  await page.screenshot({ path: "work/studio-recovery.png", fullPage: true });
+  expect(errors).toEqual([]);
+});
+
+test("other fault presets recover over HTTP", async ({ page }) => {
+  await page.goto("/", { waitUntil: "domcontentloaded" });
+  for (const name of [
+    "Duplicate delivery event",
+    "Rate-limited delivery",
+    "Unexpected payment response",
+  ]) {
+    await page.getByRole("button", { name: new RegExp(name) }).click();
+    await page
+      .getByRole("button", { name: "With recovery", exact: true })
+      .click();
+    await page.getByRole("button", { name: "Run rehearsal" }).click();
+    await expect(page.getByText("4/4 CHECKS PASSED")).toBeVisible();
+  }
+});
+
+test("mobile navigation, overflow and reduced motion", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/", { waitUntil: "domcontentloaded" });
+  await expect(
+    page.getByRole("button", { name: "Run rehearsal" }),
+  ).toBeEnabled();
+  for (const name of [
+    "Connections",
+    "Field guide",
+    "Compare strategies",
+    "Rehearsal studio",
+  ]) {
+    await page.getByRole("button", { name, exact: true }).click();
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= innerWidth,
+      ),
+    ).toBe(true);
+  }
+  await page.screenshot({ path: "work/studio-mobile.png", fullPage: true });
+});
+
+test("invalid input and cross-origin requests are rejected", async ({
+  request,
+}) => {
+  for (const body of [
+    null,
+    {},
+    { scenario: "unknown", strategy: "baseline" },
+  ]) {
+    const r = await request.post("/api/runs", {
+      data: JSON.stringify(body),
+      headers: { "Content-Type": "application/json" },
+    });
+    expect(r.status()).toBe(400);
+  }
+  const cross = await request.post("/api/runs", {
+    data: { scenario: "lost-response", strategy: "baseline" },
+    headers: { Origin: "https://example.com" },
+  });
+  expect(cross.status()).toBe(403);
+  const local = await request.post("/api/runs", {
+    data: { scenario: "duplicate-event", strategy: "recovery" },
+    headers: { Origin: "http://127.0.0.1:3040" },
+  });
+  expect(local.status()).toBe(200);
+  expect(await local.text()).toContain('"outcome":"passed"');
+});
