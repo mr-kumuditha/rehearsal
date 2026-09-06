@@ -17,6 +17,8 @@ TypeScript workflow runner ───────────────► SQLi
 
 These are three HTTP listeners in one sandbox process, not three independently deployed microservices. That keeps the project easy to run while preserving real request, timeout and retry behavior.
 
+That diagram is the default local setup. In the hosted deployment, Vercel proxies to the VPS runner and delivery passes through WSO2 API Manager 4.7.0 over authenticated HTTPS before reaching port 4313. Inventory and payment remain direct. [WSO2.md](WSO2.md) documents that boundary and its independently tested quota probe.
+
 ## Following a run
 
 The API validates the selected scenario and strategy. The runner generates a UUID and sends it as `X-Rehearsal-Run` on every provider request. Each provider keeps a separate ledger for that ID.
@@ -31,7 +33,7 @@ Faults are injected by our providers. The timeout case writes a booking synchron
 
 Idempotency keys are scoped to a provider and run. The provider checks and inserts synchronously before awaiting anything. That makes duplicate suppression deterministic in this single-process implementation. It is not a substitute for a database uniqueness constraint across replicas.
 
-The rate-limit case returns 429 on the first delivery attempt only. Recovery waits one second and retries once. This is a sandbox policy, not a verified WSO2 gateway policy. Payment schema recovery queries a trusted ledger; it does not guess that malformed data means success.
+The rate-limit case returns 429 on the first delivery attempt only. Recovery waits one second and retries once. This is a sandbox policy, distinct from the separately verified WSO2 quota on the read-only probe API. Payment schema recovery queries a trusted ledger; it does not guess that malformed data means success.
 
 ## Why these choices
 
@@ -45,7 +47,7 @@ The rate-limit case returns 429 on the first delivery attempt only. Recovery wai
 
 ## Operational boundaries
 
-- There is no user authentication. Keep the app bound to loopback; do not expose it through a public tunnel.
+- The local app has no user authentication: keep it bound to loopback. The hosted deployment has an authenticated web-to-backend proxy and isolated cookie workspaces, not user accounts.
 - Provider state is capped at 2,000 run IDs per provider. The oldest scope is evicted after the cap. This is a local memory bound, not durable retention.
 - SQLite stores completed reports without an automatic deletion policy. The UI returns the newest 100. Reports may be exported before archiving the database manually.
 - A disconnected browser does not cancel an in-flight run. It can finish and persist; check history before retrying.
