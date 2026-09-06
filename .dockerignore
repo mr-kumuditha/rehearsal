@@ -1,0 +1,9 @@
+node_modules
+.next
+.git
+.env*
+.rehearsal
+work
+test-results
+playwright-report
+.vercel
