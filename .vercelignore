@@ -4,7 +4,10 @@
 vps-backend/
 sandbox/
 tests/
-docs/
+/docs/
+# The source notes stay out, but the downloadable public guide must ship.
+!public/docs/
+!public/docs/**
 work/
 *.command
 public/fonts/*-OFL.txt
